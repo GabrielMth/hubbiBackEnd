@@ -1,0 +1,8 @@
+CREATE TABLE roles (
+    role_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(50) NOT NULL UNIQUE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT IGNORE INTO roles (role_id, name) VALUES (1, 'ADMIN');
+INSERT IGNORE INTO roles (role_id, name) VALUES (2, 'GERENTE');
+INSERT IGNORE INTO roles (role_id, name) VALUES (3, 'MEMBRO');
