@@ -1,7 +1,8 @@
 package com.api.rest.controllers;
 
 
-import com.api.rest.dto.ClienteRequestDTO;
+import com.api.rest.dto.ClienteDTO;
+import com.api.rest.dto.EnderecoDTO;
 import com.api.rest.dto.PaginacaoDTO;
 import com.api.rest.event.RecursoCriadoEvent;
 import com.api.rest.model.Cliente;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @RestController
@@ -43,11 +45,35 @@ public class ClienteController {
         return new PaginacaoDTO<>(clientes);
     }
 
+
+
     @GetMapping("/{id}")
-    public ResponseEntity<Cliente> obterClienteId(@PathVariable Long id) {
+    public ResponseEntity<ClienteDTO> obterClienteId(@PathVariable Long id) {
         Optional<Cliente> cliente = clienteRepository.findById(id);
 
-        return cliente.isPresent() ? ResponseEntity.ok(cliente.get()) : ResponseEntity.notFound().build();
+        return cliente.map(c -> {
+
+                    EnderecoDTO enderecoDTO = new EnderecoDTO(
+                            c.getEndereco().getRua(),
+                            c.getEndereco().getNumero(),
+                            c.getEndereco().getBairro(),
+                            c.getEndereco().getCep(),
+                            c.getEndereco().getCidade(),
+                            c.getEndereco().getEstado()
+                    );
+                    ClienteDTO clienteDTO = new ClienteDTO(
+                            c.getId(),
+                            c.getNome(),
+                            c.getDocumento(),
+                            c.getCelular(),
+                            c.isAtivo(),
+                            c.getTelefone(),
+                            c.getDataCadastro(),
+                            enderecoDTO
+                    );
+                    return ResponseEntity.ok(clienteDTO);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
 
@@ -59,7 +85,7 @@ public class ClienteController {
     }
 
     @PostMapping
-    public ResponseEntity<Cliente> criar(@Valid @RequestBody ClienteRequestDTO dto, HttpServletResponse response) {
+    public ResponseEntity<Cliente> criar(@Valid @RequestBody ClienteDTO dto, HttpServletResponse response) {
         Cliente clienteSalvo = clienteService.criarCliente(dto);
         publisher.publishEvent(new RecursoCriadoEvent(this, response, clienteSalvo.getId()));
         return ResponseEntity.status(HttpStatus.CREATED).body(clienteSalvo);
@@ -76,10 +102,31 @@ public class ClienteController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<Cliente> atualizar(@PathVariable Long id, @Valid @RequestBody Cliente cliente) {
+    public ResponseEntity<ClienteDTO> atualizar(@PathVariable Long id, @Valid @RequestBody Cliente cliente) {
         Cliente clienteSalvo = clienteService.atualizar(id, cliente);
-        return ResponseEntity.ok(clienteSalvo);
+
+
+        ClienteDTO responseDTO = new ClienteDTO(
+                clienteSalvo.getId(),
+                clienteSalvo.getNome(),
+                clienteSalvo.getDocumento(),
+                clienteSalvo.getCelular(),
+                clienteSalvo.isAtivo(),
+                clienteSalvo.getTelefone(),
+                clienteSalvo.getDataCadastro(),
+                new EnderecoDTO(
+                        clienteSalvo.getEndereco().getRua(),
+                        clienteSalvo.getEndereco().getNumero(),
+                        clienteSalvo.getEndereco().getCidade(),
+                        clienteSalvo.getEndereco().getEstado(),
+                        clienteSalvo.getEndereco().getCep(),
+                        clienteSalvo.getEndereco().getBairro()
+                )
+        );
+
+        return ResponseEntity.ok(responseDTO);
     }
+
 
     @PutMapping("/{id}/ativo")
     @ResponseStatus(HttpStatus.NO_CONTENT)

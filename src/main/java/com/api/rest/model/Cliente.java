@@ -1,6 +1,7 @@
 package com.api.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -25,6 +26,7 @@ public class Cliente {
     @Size(min=5, max = 60)
     private String nome;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Usuario> usuarios = new ArrayList<>();
 
@@ -43,7 +45,7 @@ public class Cliente {
     private boolean ativo;
 
     @CreationTimestamp
-    private LocalDateTime data_Cadastro;
+    private LocalDateTime dataCadastro;
 
     @OneToOne(mappedBy = "cliente", cascade = CascadeType.ALL)
     private KanbanBoard kanbanBoard;
@@ -58,16 +60,8 @@ public class Cliente {
         this.ativo = ativo;
         this.endereco = endereco;
         this.documento = documento;
-        this.data_Cadastro = data_Cadastro;
+        this.dataCadastro = data_Cadastro;
         this.kanbanBoard = kanbanBoard;
-    }
-
-    public LocalDateTime getDataCadastro() {
-        return data_Cadastro;
-    }
-
-    public void setDataCadastro(LocalDateTime data_Cadastro) {
-        this.data_Cadastro = data_Cadastro;
     }
 
     public Long getId() {
@@ -134,12 +128,12 @@ public class Cliente {
         this.kanbanBoard = kanbanBoard;
     }
 
-    public LocalDateTime getData_Cadastro() {
-        return data_Cadastro;
+    public LocalDateTime getDataCadastro() {
+        return dataCadastro;
     }
 
-    public void setData_Cadastro(LocalDateTime data_Cadastro) {
-        this.data_Cadastro = data_Cadastro;
+    public void setDataCadastro(LocalDateTime dataCadastro) {
+        this.dataCadastro = dataCadastro;
     }
 
     public List<Usuario> getUsuarios() {

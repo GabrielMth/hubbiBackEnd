@@ -53,7 +53,7 @@ public class LoginService {
                 .subject(user.getUserId().toString())
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(ACCESS_TOKEN_EXPIRE_IN))
-                .claim("name", user.getUsername())
+                .claim("username", user.getUsername())
                 .claim("roles", user.getRoles().stream().map(Role::getName).toList())
                 .build();
 
@@ -63,7 +63,7 @@ public class LoginService {
         String refreshToken = UUID.randomUUID().toString();
         refreshTokenCache.put(refreshToken, new TokenData(user.getUserId(), System.currentTimeMillis()));
 
-        return new LoginResponseDTO(accessToken, ACCESS_TOKEN_EXPIRE_IN, "Bearer", user.getUsername(), refreshToken);
+        return new LoginResponseDTO(accessToken, ACCESS_TOKEN_EXPIRE_IN, "Bearer", user.getUsername(),user.getNome(), refreshToken);
     }
 
     public String refreshToken(String refreshToken) {

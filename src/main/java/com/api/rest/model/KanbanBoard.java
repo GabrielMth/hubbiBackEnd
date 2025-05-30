@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "kanbanboards")
+@Table(name = "kanban_board")
 public class KanbanBoard {
 
     @Id

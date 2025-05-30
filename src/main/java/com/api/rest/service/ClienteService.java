@@ -1,6 +1,6 @@
 package com.api.rest.service;
 
-import com.api.rest.dto.ClienteRequestDTO;
+import com.api.rest.dto.ClienteDTO;
 import com.api.rest.dto.UsuarioDTO;
 import com.api.rest.model.Cliente;
 import com.api.rest.model.Endereco;
@@ -15,8 +15,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class ClienteService {
 
@@ -26,7 +24,7 @@ public class ClienteService {
     @Autowired private PasswordEncoder passwordEncoder;
 
 
-    public Cliente criarCliente(ClienteRequestDTO dto) {
+    public Cliente criarCliente(ClienteDTO dto) {
 
         Cliente cliente = new Cliente();
         cliente.setNome(dto.nome());
@@ -80,11 +78,11 @@ public class ClienteService {
     }
 
     public Cliente atualizar(Long id, Cliente cliente) {
-        Cliente clienteSalva = clienteRepository.findById(id)
+        Cliente clienteSalvo = clienteRepository.findById(id)
                 .orElseThrow(() -> new EmptyResultDataAccessException(1));
 
-        BeanUtils.copyProperties(cliente, clienteSalva, "id"); // Mantém o ID original
-        return clienteRepository.save(clienteSalva);
+        BeanUtils.copyProperties(cliente, clienteSalvo, "id", "usuarios");
+        return clienteRepository.save(clienteSalvo);
     }
 
     public void atualizarPropriedadeAtivo(Long id, Boolean ativo) {

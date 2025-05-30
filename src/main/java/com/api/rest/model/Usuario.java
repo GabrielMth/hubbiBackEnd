@@ -2,6 +2,7 @@ package com.api.rest.model;
 
 
 import com.api.rest.dto.LoginRequestDTO;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -26,6 +27,7 @@ public class Usuario {
 
     private String password;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
