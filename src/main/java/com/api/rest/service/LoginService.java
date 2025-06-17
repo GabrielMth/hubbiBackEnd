@@ -47,6 +47,9 @@ public class LoginService {
         var user = userOpt.get();
         Instant now = Instant.now();
 
+        user.atualizarUltimoLogin();
+        userRepository.save(user);
+
         // Criação do access token
         JwtClaimsSet accessClaims = JwtClaimsSet.builder()
                 .issuer("mybackend")

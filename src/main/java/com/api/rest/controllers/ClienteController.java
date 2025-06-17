@@ -1,13 +1,14 @@
 package com.api.rest.controllers;
 
 
-import com.api.rest.dto.ClienteDTO;
-import com.api.rest.dto.EnderecoDTO;
-import com.api.rest.dto.PaginacaoDTO;
+import com.api.rest.dto.*;
 import com.api.rest.event.RecursoCriadoEvent;
 import com.api.rest.model.Cliente;
+import com.api.rest.model.Usuario;
 import com.api.rest.repository.ClienteRepository;
+import com.api.rest.repository.UserRepository;
 import com.api.rest.service.ClienteService;
+import com.api.rest.service.UsuarioService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -36,6 +39,9 @@ public class ClienteController {
 
     @Autowired
     private ClienteService clienteService;
+
+    @Autowired
+    private UsuarioService userService;
 
 
     @GetMapping
@@ -134,8 +140,39 @@ public class ClienteController {
         clienteService.atualizarPropriedadeAtivo(id,ativo);
     }
 
+    @GetMapping("/{clienteId}/usuarios")
+    public ResponseEntity<PaginacaoDTO<UsuarioDTO>> listarUsuariosDoCliente(
+            @PathVariable Long clienteId,
+            Pageable pageable) {
 
+        PaginacaoDTO<UsuarioDTO> usuarios = userService.getUsuariosByCliente(clienteId, pageable);
+        return ResponseEntity.ok(usuarios);
+    }
 
+    @PostMapping("/{clienteId}/usuarios")
+    public ResponseEntity<UsuarioResponseDTO> criarUsuarioParaCliente(
+            @PathVariable Long clienteId,
+            @RequestBody UsuarioDTO dto) {
+
+        StringBuilder senhaGerada = new StringBuilder();
+        Usuario usuario = userService.criarUsuarioParaCliente(clienteId, dto, senhaGerada);
+
+        return ResponseEntity.ok(new UsuarioResponseDTO(
+                usuario.getUserId(),
+                usuario.getUsername(),
+                usuario.getEmail(),
+                usuario.getNome(),
+                usuario.getRoles().toString(),
+                usuario.getUltimoLogin().toString(),
+                senhaGerada.toString()
+        ));
+    }
+
+    @DeleteMapping("/usuarios/{id}")
+    public ResponseEntity<Void> excluirUsuario(@PathVariable Long id) {
+        userService.excluirUsuarioPorId(id);
+        return ResponseEntity.noContent().build();
+    }
 
 
 

@@ -1,12 +1,11 @@
 package com.api.rest.dto;
 
-public record UsuarioDTO(
+public record UsuarioResponseDTO (
         Long id,
         String username,
-        String password,
         String email,
         String nome,
         String role,
-        String ultimoLogin
+        String ultimoLogin,
+        String senhaGerada
 ) {}
-

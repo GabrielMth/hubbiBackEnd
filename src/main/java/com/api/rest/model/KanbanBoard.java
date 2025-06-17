@@ -1,6 +1,7 @@
 package com.api.rest.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,8 @@ public class KanbanBoard {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "cliente_id", nullable = false)
+    @JoinColumn(name = "cliente_id", unique = true)
+    @JsonBackReference
     private Cliente cliente;
 
     @OneToMany(mappedBy = "kanbanBoard", cascade = CascadeType.ALL, orphanRemoval = true)

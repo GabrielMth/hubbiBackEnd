@@ -1,5 +1,7 @@
 package com.api.rest.exceptionhandler;
 
+import com.api.rest.service.exceptionDeRegraDeNegocio.SenhaAtualIncorretaException;
+import com.api.rest.service.exceptionDeRegraDeNegocio.UsuarioTaskMovimentoException;
 import com.api.rest.service.exceptionDeRegraDeNegocio.PessoaInexistenteOuInativaException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +19,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -27,9 +29,10 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 
-@ControllerAdvice
+@RestControllerAdvice
 public class SystemExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Autowired
@@ -90,8 +93,28 @@ public class SystemExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.badRequest().body(erros);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException ex) {
+        return ResponseEntity.badRequest().body(Map.of("erro", ex.getMessage()));
+    }
 
-    @Override  //atributo null
+    @ExceptionHandler(UsuarioTaskMovimentoException.class)
+    public ResponseEntity<Object> handleNegocioException(UsuarioTaskMovimentoException ex, WebRequest request) {
+        String mensagemUsuario = messageSource.getMessage("usuario.movimento-contem", null, LocaleContextHolder.getLocale());
+        String mensagemDesenvolvedor = ex.toString();
+        List<Erro> erros = List.of(new Erro(mensagemUsuario, mensagemDesenvolvedor));
+        return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(SenhaAtualIncorretaException.class)
+    public ResponseEntity<List<Map<String, String>>> handleSenhaAtualIncorreta(SenhaAtualIncorretaException ex) {
+        Map<String, String> body = Map.of(
+                "mensagemUsuario", ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(List.of(body));
+    }
+
+    @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
                                                                   HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 

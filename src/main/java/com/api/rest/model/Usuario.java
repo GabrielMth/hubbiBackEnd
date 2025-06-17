@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.Instant;
 import java.util.Set;
 
 @Entity
@@ -39,6 +40,9 @@ public class Usuario {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles;
+
+    @Column(name = "ultimo_login")
+    private Instant ultimoLogin;
 
 
     public Usuario() {
@@ -90,6 +94,10 @@ public class Usuario {
         return passwordEncoder.matches(loginRequest.password(), this.password);
     }
 
+    public void atualizarUltimoLogin() {
+        this.ultimoLogin = Instant.now();
+    }
+
     public Cliente getCliente() {
         return cliente;
     }
@@ -126,4 +134,13 @@ public class Usuario {
     public int hashCode() {
         return getClass().hashCode();
     }
+
+    public Instant getUltimoLogin() {
+        return ultimoLogin;
+    }
+
+    public void setUltimoLogin(Instant ultimoLogin) {
+        this.ultimoLogin = ultimoLogin;
+    }
 }
+

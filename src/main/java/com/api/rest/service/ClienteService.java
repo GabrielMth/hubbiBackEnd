@@ -69,7 +69,7 @@ public class ClienteService {
         usuario.setEmail(usuarioDTO.email());
         usuario.setUsername(usuarioDTO.username());
         usuario.setPassword(passwordEncoder.encode(usuarioDTO.password()));
-        usuario.setCliente(cliente);  // Associar o usuário ao cliente
+        usuario.setCliente(cliente);
 
 
         usuario = usuarioRepository.save(usuario);

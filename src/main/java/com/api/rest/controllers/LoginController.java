@@ -31,6 +31,7 @@ public class LoginController {
         return ResponseEntity.ok("Logout realizado com sucesso");
     }
 
+
     @PostMapping("/refresh")
     public ResponseEntity<String> refreshAccessToken(@RequestBody String refreshToken) {
         String newAccessToken = loginService.refreshToken(refreshToken);

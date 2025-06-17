@@ -48,6 +48,7 @@ public class Cliente {
     private LocalDateTime dataCadastro;
 
     @OneToOne(mappedBy = "cliente", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private KanbanBoard kanbanBoard;
 
 
