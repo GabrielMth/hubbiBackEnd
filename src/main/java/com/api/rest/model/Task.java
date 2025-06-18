@@ -2,7 +2,10 @@ package com.api.rest.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.Instant;
 import java.util.List;
 
 @Entity
@@ -10,17 +13,23 @@ import java.util.List;
 public class Task {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
+    @Size(min=5, max = 80)
     private String titulo;
 
     @NotNull
     private String descricao;
 
     @Enumerated(EnumType.STRING)
-    private TaskStatus prioridade;
+    @Column(nullable = false)
+    private TaskPrioridade prioridade;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TaskStatus status;
 
     @ManyToOne
     @JoinColumn(name = "kanban_board_id")
@@ -32,6 +41,10 @@ public class Task {
 
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
     private List<TaskMovement> movimentacoes;
+
+    @Column(name = "data_criacao", nullable = false, updatable = false)
+    @CreationTimestamp
+    private Instant data_Criacao;
 
     public Long getId() {
         return id;
@@ -65,14 +78,6 @@ public class Task {
         this.kanbanBoard = kanbanBoard;
     }
 
-    public TaskStatus getPrioridade() {
-        return prioridade;
-    }
-
-    public void setPrioridade(TaskStatus prioridade) {
-        this.prioridade = prioridade;
-    }
-
     public String getDescricao() {
         return descricao;
     }
@@ -89,17 +94,43 @@ public class Task {
         this.titulo = titulo;
     }
 
+    public TaskPrioridade getPrioridade() {
+        return prioridade;
+    }
+
+    public void setPrioridade(TaskPrioridade prioridade) {
+        this.prioridade = prioridade;
+    }
+
+    public TaskStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TaskStatus status) {
+        this.status = status;
+    }
+
+    public Instant getData_Criacao() {
+        return data_Criacao;
+    }
+
+    public void setData_Criacao(Instant data_Criacao) {
+        this.data_Criacao = data_Criacao;
+    }
+
     public Task() {
 
     }
 
-    public Task(Long id, String titulo, String descricao, TaskStatus prioridade, KanbanBoard kanbanBoard, Usuario autor, List<TaskMovement> movimentacoes) {
+    public Task(Long id, String titulo, String descricao, TaskPrioridade prioridade, TaskStatus status, KanbanBoard kanbanBoard, Usuario autor, List<TaskMovement> movimentacoes, Instant dataCriacao) {
         this.id = id;
         this.titulo = titulo;
         this.descricao = descricao;
         this.prioridade = prioridade;
+        this.status = status;
         this.kanbanBoard = kanbanBoard;
         this.autor = autor;
         this.movimentacoes = movimentacoes;
+        this.data_Criacao = data_Criacao;
     }
 }

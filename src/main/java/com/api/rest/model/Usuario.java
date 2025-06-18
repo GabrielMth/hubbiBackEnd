@@ -4,6 +4,8 @@ package com.api.rest.model;
 import com.api.rest.dto.LoginRequestDTO;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Instant;
@@ -18,14 +20,20 @@ public class Usuario {
     @Column(name = "user_id")
     private Long userId;
 
+    @NotNull
     private String nome;
 
     @Column(unique = true)
+    @NotNull
+    @Size(min=5, max = 50)
     private String username;
 
     @Column(unique = true)
+    @NotNull
     private String email;
 
+    @NotNull
+    @Size(min=5, max = 150)
     private String password;
 
     @JsonBackReference

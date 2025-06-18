@@ -101,7 +101,7 @@ public class ClienteController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void remover(@PathVariable Long id) {
         if (!clienteRepository.existsById(id)) {
-            throw new EmptyResultDataAccessException(1); // Lança exceção sem mensagem
+            throw new EmptyResultDataAccessException(1);
         }
         clienteRepository.deleteById(id);
     }
@@ -152,7 +152,7 @@ public class ClienteController {
     @PostMapping("/{clienteId}/usuarios")
     public ResponseEntity<UsuarioResponseDTO> criarUsuarioParaCliente(
             @PathVariable Long clienteId,
-            @RequestBody UsuarioDTO dto) {
+            @Valid @RequestBody UsuarioDTO dto) {
 
         StringBuilder senhaGerada = new StringBuilder();
         Usuario usuario = userService.criarUsuarioParaCliente(clienteId, dto, senhaGerada);

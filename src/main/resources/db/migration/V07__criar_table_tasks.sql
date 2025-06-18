@@ -2,7 +2,7 @@ CREATE TABLE tasks (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     titulo VARCHAR(255) NOT NULL,
     descricao TEXT NOT NULL,
-    prioridade ENUM('ALTA', 'MEDIA', 'BAIXA') DEFAULT 'BAIXA',
+    prioridade ENUM('ALTA', 'MEDIA', 'BAIXA', 'CRITICA') DEFAULT 'BAIXA',
     kanban_board_id BIGINT,
     autor_id BIGINT(20),
 

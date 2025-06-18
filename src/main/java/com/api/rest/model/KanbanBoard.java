@@ -2,6 +2,7 @@ package com.api.rest.model;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ public class KanbanBoard {
     private Cliente cliente;
 
     @OneToMany(mappedBy = "kanbanBoard", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Task> tasks = new ArrayList<>();
 
     public KanbanBoard() {

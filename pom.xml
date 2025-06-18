@@ -100,6 +100,12 @@
 			<version>2.6.0</version>
 		</dependency>
 
+		<dependency>
+			<groupId>io.swagger.core.v3</groupId>
+			<artifactId>swagger-annotations-jakarta</artifactId>
+			<version>2.2.8</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -107,6 +113,17 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<version>10.10.0</version>
+				<configuration>
+					<url>jdbc:mysql://localhost/backendapis?useTimezone=true&amp;serverTimezone=America/Sao_Paulo&amp;createDatabaseIfNotExist=true&amp;useSSL=false&amp;allowPublicKeyRetrieval=true</url>
+					<user>root</user>
+					<password>12345</password>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

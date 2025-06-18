@@ -51,7 +51,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuario/registrar").permitAll()
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").hasRole("ADMIN")
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .cors(Customizer.withDefaults())

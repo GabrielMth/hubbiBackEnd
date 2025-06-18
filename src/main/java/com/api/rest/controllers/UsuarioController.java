@@ -39,27 +39,6 @@ public class UsuarioController {
         this.userRepository = userRepository;
     }
 
-    @Transactional
-    @PostMapping("/registrar")
-    public ResponseEntity<Void> registrarUser (@RequestBody CreateUserDTO dto) {
-
-        var basicRole = roleRepository.findByName(Role.Values.MEMBRO.name());
-
-        var userFromDb = userRepository.findByUsername(dto.username());
-        if  (userFromDb.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
-        }
-
-        var user = new Usuario();
-        user.setUsername(dto.username());
-        user.setPassword(passwordEncoder.encode(dto.password()));
-        user.setRoles(Set.of(basicRole));
-
-        userRepository.save(user);
-
-        return ResponseEntity.ok().build();
-    }
-
     @PatchMapping("/senha")
     public ResponseEntity<Object> atualizarSenhaUsuario(
             @Valid @RequestBody AtualizarSenhaDTO dto,

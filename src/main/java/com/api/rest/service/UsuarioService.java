@@ -124,7 +124,7 @@ public class UsuarioService {
 
     public void atualizarSenha(Long usuarioId, String senhaAtual, String novaSenha) {
         Usuario usuario = userRepository.findById(usuarioId)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado, contato o Desenvolvedor"));
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado, contate o Desenvolvedor"));
 
         if (!passwordEncoder.matches(senhaAtual, usuario.getPassword())) {
             throw new SenhaAtualIncorretaException("Senha atual incorreta");
