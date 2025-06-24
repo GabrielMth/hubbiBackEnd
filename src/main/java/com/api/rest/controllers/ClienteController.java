@@ -2,11 +2,12 @@ package com.api.rest.controllers;
 
 
 import com.api.rest.dto.*;
+import com.api.rest.dto.clienteDto.ClienteDTO;
+import com.api.rest.dto.clienteDto.ClienteDropdownDTO;
 import com.api.rest.event.RecursoCriadoEvent;
 import com.api.rest.model.Cliente;
 import com.api.rest.model.Usuario;
 import com.api.rest.repository.ClienteRepository;
-import com.api.rest.repository.UserRepository;
 import com.api.rest.service.ClienteService;
 import com.api.rest.service.UsuarioService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,9 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -51,6 +50,10 @@ public class ClienteController {
         return new PaginacaoDTO<>(clientes);
     }
 
+    @GetMapping("/dropdown")
+    public List<ClienteDropdownDTO> listarClientesParaDropDown() {
+         return clienteRepository.buscarParaDropDown();
+    }
 
 
     @GetMapping("/{id}")

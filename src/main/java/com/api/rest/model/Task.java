@@ -44,7 +44,7 @@ public class Task {
 
     @Column(name = "data_criacao", nullable = false, updatable = false)
     @CreationTimestamp
-    private Instant data_Criacao;
+    private Instant dataCriacao;
 
     public Long getId() {
         return id;
@@ -111,11 +111,11 @@ public class Task {
     }
 
     public Instant getData_Criacao() {
-        return data_Criacao;
+        return dataCriacao;
     }
 
-    public void setData_Criacao(Instant data_Criacao) {
-        this.data_Criacao = data_Criacao;
+    public void setData_Criacao(Instant dataCriacao) {
+        this.dataCriacao = dataCriacao;
     }
 
     public Task() {
@@ -131,6 +131,6 @@ public class Task {
         this.kanbanBoard = kanbanBoard;
         this.autor = autor;
         this.movimentacoes = movimentacoes;
-        this.data_Criacao = data_Criacao;
+        this.dataCriacao = dataCriacao;
     }
 }

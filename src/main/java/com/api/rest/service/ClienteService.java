@@ -1,6 +1,6 @@
 package com.api.rest.service;
 
-import com.api.rest.dto.ClienteDTO;
+import com.api.rest.dto.clienteDto.ClienteDTO;
 import com.api.rest.dto.UsuarioDTO;
 import com.api.rest.model.Cliente;
 import com.api.rest.model.Endereco;

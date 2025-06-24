@@ -10,6 +10,6 @@ public record NovaTaskDTO(
         @NotBlank String descricao,
         @NotNull TaskPrioridade prioridade,
         @NotNull TaskStatus status,
-        @NotNull Long kanbanBoardId,
+        @NotNull Long clienteId,
         @NotNull Long autorId
 ) {}

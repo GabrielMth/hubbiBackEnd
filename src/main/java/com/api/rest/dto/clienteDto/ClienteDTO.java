@@ -1,4 +1,6 @@
-package com.api.rest.dto;
+package com.api.rest.dto.clienteDto;
+
+import com.api.rest.dto.EnderecoDTO;
 
 import java.time.LocalDateTime;
 
