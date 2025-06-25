@@ -4,28 +4,61 @@ import com.api.rest.model.TaskPrioridade;
 import com.api.rest.model.TaskStatus;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 public class TaskTableResponseDTO {
+
     private Long id;
     private String titulo;
     private TaskPrioridade prioridade;
     private TaskStatus status;
-    private KanbanBoardIdDTO kanbanBoard;
-    private AutorResumoDTO autor;
     private Instant dataCriacao;
+    private AutorResumoDTO autor;
+    private KanbanBoardIdDTO kanbanBoard;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public String getTitulo() { return titulo; }
-    public void setTitulo(String titulo) { this.titulo = titulo; }
-
-    public TaskPrioridade getPrioridade() {
-        return prioridade;
+    public TaskTableResponseDTO(Long id, String titulo, TaskPrioridade prioridade, TaskStatus status,
+                                Instant dataCriacao, AutorResumoDTO autor, KanbanBoardIdDTO kanbanBoard) {
+        this.id = id;
+        this.titulo = titulo;
+        this.prioridade = prioridade;
+        this.status = status;
+        this.dataCriacao = dataCriacao;
+        this.autor = autor;
+        this.kanbanBoard = kanbanBoard;
     }
 
-    public void setPrioridade(TaskPrioridade prioridade) {
-        this.prioridade = prioridade;
+    public TaskTableResponseDTO(){}
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public KanbanBoardIdDTO getKanbanBoard() {
+        return kanbanBoard;
+    }
+
+    public void setKanbanBoard(KanbanBoardIdDTO kanbanBoard) {
+        this.kanbanBoard = kanbanBoard;
+    }
+
+    public AutorResumoDTO getAutor() {
+        return autor;
+    }
+
+    public void setAutor(AutorResumoDTO autor) {
+        this.autor = autor;
+    }
+
+    public Instant getDataCriacao() {
+        return dataCriacao;
+    }
+
+    public void setDataCriacao(Instant dataCriacao) {
+        this.dataCriacao = dataCriacao;
     }
 
     public TaskStatus getStatus() {
@@ -36,37 +69,19 @@ public class TaskTableResponseDTO {
         this.status = status;
     }
 
-    public Instant getDataCriacao() { return dataCriacao; }
-    public void setDataCriacao(Instant dataCriacao) { this.dataCriacao = dataCriacao; }
-
-    public KanbanBoardIdDTO getKanbanBoard() { return kanbanBoard; }
-    public void setKanbanBoard(KanbanBoardIdDTO kanbanBoard) { this.kanbanBoard = kanbanBoard; }
-
-    public AutorResumoDTO getAutor() { return autor; }
-    public void setAutor(AutorResumoDTO autor) { this.autor = autor; }
-
-    public static class KanbanBoardIdDTO {
-        private Long id;
-
-        public KanbanBoardIdDTO(Long id) { this.id = id; }
-        public Long getId() { return id; }
-        public void setId(Long id) { this.id = id; }
+    public TaskPrioridade getPrioridade() {
+        return prioridade;
     }
 
-    public static class AutorResumoDTO {
-        private Long userId;
-        private String nome;
-
-        public AutorResumoDTO(Long userId, String nome) {
-            this.userId = userId;
-            this.nome = nome;
-        }
-
-        public Long getUserId() { return userId; }
-        public void setUserId(Long userId) { this.userId = userId; }
-
-        public String getNome() { return nome; }
-        public void setNome(String nome) { this.nome = nome; }
+    public void setPrioridade(TaskPrioridade prioridade) {
+        this.prioridade = prioridade;
     }
 
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
 }

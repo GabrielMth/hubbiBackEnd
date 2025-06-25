@@ -1,25 +1,17 @@
 package com.api.rest.service;
 
 import com.api.rest.dto.PaginacaoDTO;
-import com.api.rest.dto.taskDto.NovaTaskDTO;
-import com.api.rest.dto.taskDto.TaskResponseDTO;
-import com.api.rest.dto.taskDto.TaskTableResponseDTO;
-import com.api.rest.model.Cliente;
-import com.api.rest.model.KanbanBoard;
-import com.api.rest.model.Task;
-import com.api.rest.model.Usuario;
+import com.api.rest.dto.taskDto.*;
+import com.api.rest.model.*;
 import com.api.rest.repository.KanbanBoardRepository;
 import com.api.rest.repository.TaskRepository;
 import com.api.rest.repository.UserRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.List;
+import java.time.LocalDate;
 
 @Service
 public class TaskService {
@@ -64,6 +56,39 @@ public class TaskService {
         return new PaginacaoDTO<>(dtoPage);
     }
 
+    public PaginacaoDTO<TaskTableResponseDTO> listarTasksComFiltro(
+            Long clienteId,
+            String titulo,
+            String status,
+            String prioridade,
+            Instant dataInicio,
+            Instant dataFim,
+            Pageable pageable) {
+
+        TaskStatus statusEnum = null;
+        if (status != null && !status.isBlank()) {
+            try {
+                statusEnum = TaskStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Status inválido: " + status);
+            }
+        }
+
+        TaskPrioridade prioridadeEnum = null;
+        if (prioridade != null && !prioridade.isBlank()) {
+            try {
+                prioridadeEnum = TaskPrioridade.valueOf(prioridade.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Prioridade inválida: " + prioridade);
+            }
+        }
+
+        Page<TaskTableResponseDTO> result = taskRepository.listarTasksComFiltro(
+                clienteId, titulo, statusEnum, prioridadeEnum, dataInicio, dataFim, pageable);
+
+        return new PaginacaoDTO<>(result);
+    }
+
     private TaskTableResponseDTO mapTableToDTO(Task task) {
         TaskTableResponseDTO dto = new TaskTableResponseDTO();
         dto.setId(task.getId());
@@ -73,10 +98,8 @@ public class TaskService {
         dto.setDataCriacao(task.getData_Criacao());
 
 
-        // Mapear autor
         if (task.getAutor() != null) {
-            // supondo que autor tenha getUserId() e getNome()
-            TaskTableResponseDTO.AutorResumoDTO autorDTO = new TaskTableResponseDTO.AutorResumoDTO(
+            AutorResumoDTO autorDTO = new AutorResumoDTO(
                     task.getAutor().getUserId(),
                     task.getAutor().getNome()
             );
@@ -85,10 +108,9 @@ public class TaskService {
             dto.setAutor(null);
         }
 
-        // Se desejar, mapear o KanbanBoard também
         if (task.getKanbanBoard() != null) {
-            TaskTableResponseDTO.KanbanBoardIdDTO kanbanDTO =
-                    new TaskTableResponseDTO.KanbanBoardIdDTO(task.getKanbanBoard().getId());
+            KanbanBoardIdDTO kanbanDTO =
+                    new KanbanBoardIdDTO(task.getKanbanBoard().getId());
             dto.setKanbanBoard(kanbanDTO);
         } else {
             dto.setKanbanBoard(null);
@@ -96,4 +118,6 @@ public class TaskService {
 
         return dto;
     }
+
+
 }
