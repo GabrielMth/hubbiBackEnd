@@ -8,7 +8,6 @@ import com.api.rest.model.Cliente;
 import com.api.rest.model.KanbanBoard;
 import com.api.rest.repository.ClienteRepository;
 import com.api.rest.service.TaskService;
-import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -62,7 +61,7 @@ public class TaskController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/filtro")
     public ResponseEntity<PaginacaoDTO<TaskTableResponseDTO>> filtrarTasks(
-            @RequestParam(required = false) Long clienteId,
+            @RequestParam(required = true) Long clienteId,
             @RequestParam(required = false) String titulo,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String prioridade,
@@ -70,6 +69,13 @@ public class TaskController {
             @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate dataFim,
             Pageable pageable
             ) {
+
+        if (dataInicio != null && dataFim != null && dataInicio.isAfter(dataFim)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "A data de início não pode ser posterior à data final."
+            );
+        }
 
         Instant inicioInstant = null;
         Instant fimInstant = null;
@@ -86,5 +92,13 @@ public class TaskController {
 
         return ResponseEntity.ok(resultado);
     }
+
+    @DeleteMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deletarTask(@PathVariable Long id) {
+        taskService.deletarPorId(id);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }

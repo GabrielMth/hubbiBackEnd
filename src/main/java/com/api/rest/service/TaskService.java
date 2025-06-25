@@ -6,9 +6,12 @@ import com.api.rest.model.*;
 import com.api.rest.repository.KanbanBoardRepository;
 import com.api.rest.repository.TaskRepository;
 import com.api.rest.repository.UserRepository;
+import com.api.rest.service.exceptionDeRegraDeNegocio.TarefaFinalizadaNotDelete;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -20,7 +23,7 @@ public class TaskService {
     private final KanbanBoardRepository kanbanBoardRepository;
     private final TaskRepository taskRepository;
 
-    public TaskService (UserRepository userRepository, KanbanBoardRepository kanbanBoardRepository, TaskRepository taskRepository) {
+    public TaskService(UserRepository userRepository, KanbanBoardRepository kanbanBoardRepository, TaskRepository taskRepository) {
         this.userRepository = userRepository;
         this.kanbanBoardRepository = kanbanBoardRepository;
         this.taskRepository = taskRepository;
@@ -117,6 +120,18 @@ public class TaskService {
         }
 
         return dto;
+    }
+
+    @Transactional
+    public void deletarPorId(Long id) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Tarefa não encontrada com ID: " + id));
+
+        if (task.getStatus() != null && task.getStatus().name().equals("FINALIZADA")) {
+            throw new TarefaFinalizadaNotDelete();
+        }
+
+        taskRepository.deleteById(id);
     }
 
 

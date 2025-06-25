@@ -1,6 +1,7 @@
 package com.api.rest.exceptionhandler;
 
 import com.api.rest.service.exceptionDeRegraDeNegocio.SenhaAtualIncorretaException;
+import com.api.rest.service.exceptionDeRegraDeNegocio.TarefaFinalizadaNotDelete;
 import com.api.rest.service.exceptionDeRegraDeNegocio.UsuarioTaskMovimentoException;
 import com.api.rest.service.exceptionDeRegraDeNegocio.PessoaInexistenteOuInativaException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -105,6 +106,13 @@ public class SystemExceptionHandler extends ResponseEntityExceptionHandler {
         List<Erro> erros = List.of(new Erro(mensagemUsuario, mensagemDesenvolvedor));
         return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
+    @ExceptionHandler(TarefaFinalizadaNotDelete.class)
+    public ResponseEntity<Object> handleTarefaFinalizadaNotDelete(TarefaFinalizadaNotDelete ex, WebRequest request) {
+        String mensagemUsuario = messageSource.getMessage("tarefa.finalizada-nao-pode-excluir", null, LocaleContextHolder.getLocale());
+        String mensagemDesenvolvedor = ex.toString();
+        List<Erro> erros = List.of(new Erro(mensagemUsuario, mensagemDesenvolvedor));
+        return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
 
     @ExceptionHandler(SenhaAtualIncorretaException.class)
     public ResponseEntity<List<Map<String, String>>> handleSenhaAtualIncorreta(SenhaAtualIncorretaException ex) {
@@ -113,6 +121,8 @@ public class SystemExceptionHandler extends ResponseEntityExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(List.of(body));
     }
+
+
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,

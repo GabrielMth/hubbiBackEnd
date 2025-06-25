@@ -4,7 +4,6 @@ import com.api.rest.model.TaskPrioridade;
 import com.api.rest.model.TaskStatus;
 
 import java.time.Instant;
-import java.time.LocalDate;
 
 public class TaskTableResponseDTO {
 
