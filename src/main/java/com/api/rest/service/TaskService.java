@@ -127,7 +127,7 @@ public class TaskService {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Tarefa não encontrada com ID: " + id));
 
-        if (task.getStatus() != null && task.getStatus().name().equals("FINALIZADA")) {
+        if (task.getStatus() != null && task.getStatus().name().equals("APROVADO")) {
             throw new TarefaFinalizadaNotDelete();
         }
 

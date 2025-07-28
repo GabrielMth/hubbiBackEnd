@@ -46,6 +46,17 @@ public class Task {
     @CreationTimestamp
     private Instant dataCriacao;
 
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comentario> comentarios;
+
+    public List<Comentario> getComentarios() {
+        return comentarios;
+    }
+
+    public void setComentarios(List<Comentario> comentarios) {
+        this.comentarios = comentarios;
+    }
+
     public Long getId() {
         return id;
     }
@@ -122,15 +133,16 @@ public class Task {
 
     }
 
-    public Task(Long id, String titulo, String descricao, TaskPrioridade prioridade, TaskStatus status, KanbanBoard kanbanBoard, Usuario autor, List<TaskMovement> movimentacoes, Instant dataCriacao) {
+    public Task(Long id, List<Comentario> comentarios, Instant dataCriacao, List<TaskMovement> movimentacoes, Usuario autor, TaskStatus status, KanbanBoard kanbanBoard, TaskPrioridade prioridade, String descricao, String titulo) {
         this.id = id;
-        this.titulo = titulo;
-        this.descricao = descricao;
-        this.prioridade = prioridade;
+        this.comentarios = comentarios;
+        this.dataCriacao = dataCriacao;
+        this.movimentacoes = movimentacoes;
+        this.autor = autor;
         this.status = status;
         this.kanbanBoard = kanbanBoard;
-        this.autor = autor;
-        this.movimentacoes = movimentacoes;
-        this.dataCriacao = dataCriacao;
+        this.prioridade = prioridade;
+        this.descricao = descricao;
+        this.titulo = titulo;
     }
 }

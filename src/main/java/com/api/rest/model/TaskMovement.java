@@ -17,11 +17,11 @@ public class TaskMovement {
     private Task task;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status_origem")
+    @Column(name = "coluna_origem")
     private TaskStatus statusOrigem;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status_destino")
+    @Column(name = "coluna_destino")
     private TaskStatus statusDestino;
 
     @ManyToOne

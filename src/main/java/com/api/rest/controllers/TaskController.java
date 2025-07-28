@@ -93,7 +93,7 @@ public class TaskController {
         return ResponseEntity.ok(resultado);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deletarTask(@PathVariable Long id) {
         taskService.deletarPorId(id);
