@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
@@ -50,6 +51,15 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
 
     Page<Task> findByKanbanBoardId(Long kanbanBoardId, Pageable pageable);
+
+    @Query("SELECT t FROM Task t " +
+            "LEFT JOIN FETCH t.movimentacoes m " +
+            "LEFT JOIN FETCH t.comentarios c " +
+            "LEFT JOIN FETCH c.autor " +
+            "LEFT JOIN FETCH t.autor " +
+            "LEFT JOIN FETCH t.kanbanBoard " +
+            "WHERE t.id = :id")
+    Optional<Task> buscarDetalhada(@Param("id") Long id);
 
 
 }

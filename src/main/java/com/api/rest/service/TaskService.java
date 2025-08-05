@@ -7,14 +7,12 @@ import com.api.rest.repository.KanbanBoardRepository;
 import com.api.rest.repository.TaskRepository;
 import com.api.rest.repository.UserRepository;
 import com.api.rest.service.exceptionDeRegraDeNegocio.TarefaFinalizadaNotDelete;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.time.LocalDate;
 
 @Service
 public class TaskService {
@@ -132,6 +130,14 @@ public class TaskService {
         }
 
         taskRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public TaskDetalhamentoDTO buscarDetalhadoPorId(Long id) {
+        Task task = taskRepository.buscarDetalhada(id)
+                .orElseThrow(() -> new RuntimeException("Task não encontrada com ID: " + id));
+
+        return TaskDetalhamentoDTO.fromEntity(task);
     }
 
 

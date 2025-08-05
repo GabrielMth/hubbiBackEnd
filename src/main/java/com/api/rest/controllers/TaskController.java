@@ -2,10 +2,12 @@ package com.api.rest.controllers;
 
 import com.api.rest.dto.PaginacaoDTO;
 import com.api.rest.dto.taskDto.NovaTaskDTO;
+import com.api.rest.dto.taskDto.TaskDetalhamentoDTO;
 import com.api.rest.dto.taskDto.TaskResponseDTO;
 import com.api.rest.dto.taskDto.TaskTableResponseDTO;
 import com.api.rest.model.Cliente;
 import com.api.rest.model.KanbanBoard;
+import com.api.rest.model.Task;
 import com.api.rest.repository.ClienteRepository;
 import com.api.rest.service.TaskService;
 import jakarta.validation.Valid;
@@ -98,6 +100,13 @@ public class TaskController {
     public ResponseEntity<Void> deletarTask(@PathVariable Long id) {
         taskService.deletarPorId(id);
         return ResponseEntity.noContent().build();
+    }
+
+
+    @GetMapping("/detalhes/{id}")
+    public ResponseEntity<TaskDetalhamentoDTO> detalharTask(@PathVariable Long id) {
+        TaskDetalhamentoDTO dto = taskService.buscarDetalhadoPorId(id);
+        return ResponseEntity.ok(dto);
     }
 
 

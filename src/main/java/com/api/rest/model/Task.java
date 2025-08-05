@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "tasks")
@@ -47,13 +48,13 @@ public class Task {
     private Instant dataCriacao;
 
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comentario> comentarios;
+    private Set<Comentario> comentarios;
 
-    public List<Comentario> getComentarios() {
+    public Set<Comentario> getComentarios() {
         return comentarios;
     }
 
-    public void setComentarios(List<Comentario> comentarios) {
+    public void setComentarios(Set<Comentario> comentarios) {
         this.comentarios = comentarios;
     }
 
@@ -133,7 +134,7 @@ public class Task {
 
     }
 
-    public Task(Long id, List<Comentario> comentarios, Instant dataCriacao, List<TaskMovement> movimentacoes, Usuario autor, TaskStatus status, KanbanBoard kanbanBoard, TaskPrioridade prioridade, String descricao, String titulo) {
+    public Task(Long id, Set<Comentario> comentarios, Instant dataCriacao, List<TaskMovement> movimentacoes, Usuario autor, TaskStatus status, KanbanBoard kanbanBoard, TaskPrioridade prioridade, String descricao, String titulo) {
         this.id = id;
         this.comentarios = comentarios;
         this.dataCriacao = dataCriacao;
