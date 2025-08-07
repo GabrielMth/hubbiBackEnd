@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table (name="comentarios")
@@ -17,8 +19,6 @@ public class Comentario {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String texto;
 
-    private String midiaUrl; // video ou imagem
-
     @CreationTimestamp
     @Column(name = "criado_em", nullable = false, updatable = false)
     private Instant criadoEm;
@@ -27,19 +27,30 @@ public class Comentario {
     @JoinColumn(name = "autor_id")
     private Usuario autor;
 
+    @OneToMany(mappedBy = "comentario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ComentarioMidia> midias = new ArrayList<>();
+
     @ManyToOne
     @JoinColumn(name = "task_id")
     private Task task;
 
     public Comentario(){}
 
-    public Comentario(Long id, Task task, Instant criadoEm, Usuario autor, String midiaUrl, String texto) {
+    public Comentario(Long id, String texto, Instant criadoEm, Usuario autor, List<ComentarioMidia> midias, Task task) {
         this.id = id;
-        this.task = task;
+        this.texto = texto;
         this.criadoEm = criadoEm;
         this.autor = autor;
-        this.midiaUrl = midiaUrl;
-        this.texto = texto;
+        this.midias = midias;
+        this.task = task;
+    }
+
+    public List<ComentarioMidia> getMidias() {
+        return midias;
+    }
+
+    public void setMidias(List<ComentarioMidia> midias) {
+        this.midias = midias;
     }
 
     public Long getId() {
@@ -72,14 +83,6 @@ public class Comentario {
 
     public void setAutor(Usuario autor) {
         this.autor = autor;
-    }
-
-    public String getMidiaUrl() {
-        return midiaUrl;
-    }
-
-    public void setMidiaUrl(String midiaUrl) {
-        this.midiaUrl = midiaUrl;
     }
 
     public String getTexto() {

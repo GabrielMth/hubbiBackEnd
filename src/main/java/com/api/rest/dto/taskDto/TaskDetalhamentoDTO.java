@@ -1,6 +1,6 @@
 package com.api.rest.dto.taskDto;
 
-import com.api.rest.model.Comentario;
+import com.api.rest.dto.taskDto.ComentarioDTO;
 import com.api.rest.model.Task;
 import com.api.rest.model.TaskMovement;
 import com.api.rest.model.Usuario;
@@ -20,8 +20,6 @@ public class TaskDetalhamentoDTO {
     private Instant dataCriacao;
 
     private AutorResumoDTO autor;
-
-    private List<ComentarioDTO> comentarios;
     private List<MovimentacaoDTO> movimentacoes;
 
     public static TaskDetalhamentoDTO fromEntity(Task task) {
@@ -37,12 +35,11 @@ public class TaskDetalhamentoDTO {
         Usuario autor = task.getAutor();
         dto.autor = new AutorResumoDTO(autor.getUserId(), autor.getNome());
 
-        dto.comentarios = task.getComentarios() != null
-                ? task.getComentarios().stream().map(ComentarioDTO::fromEntity).collect(Collectors.toList())
-                : List.of();
 
         dto.movimentacoes = task.getMovimentacoes() != null
-                ? task.getMovimentacoes().stream().map(MovimentacaoDTO::fromEntity).collect(Collectors.toList())
+                ? task.getMovimentacoes().stream()
+                .map(MovimentacaoDTO::fromEntity)
+                .collect(Collectors.toList())
                 : List.of();
 
         return dto;
@@ -64,13 +61,6 @@ public class TaskDetalhamentoDTO {
         this.movimentacoes = movimentacoes;
     }
 
-    public List<ComentarioDTO> getComentarios() {
-        return comentarios;
-    }
-
-    public void setComentarios(List<ComentarioDTO> comentarios) {
-        this.comentarios = comentarios;
-    }
 
     public AutorResumoDTO getAutor() {
         return autor;
@@ -143,54 +133,6 @@ public class TaskDetalhamentoDTO {
 
         public void setNome(String nome) {
             this.nome = nome;
-        }
-    }
-
-    public static class ComentarioDTO {
-        private String texto;
-        private String midiaUrl;
-        private Instant criadoEm;
-        private String autor;
-
-        public static ComentarioDTO fromEntity(Comentario c) {
-            ComentarioDTO dto = new ComentarioDTO();
-            dto.texto = c.getTexto();
-            dto.midiaUrl = c.getMidiaUrl();
-            dto.criadoEm = c.getCriadoEm();
-            dto.autor = c.getAutor() != null ? c.getAutor().getNome() : null;
-            return dto;
-        }
-
-        public String getTexto() {
-            return texto;
-        }
-
-        public void setTexto(String texto) {
-            this.texto = texto;
-        }
-
-        public String getAutor() {
-            return autor;
-        }
-
-        public void setAutor(String autor) {
-            this.autor = autor;
-        }
-
-        public Instant getCriadoEm() {
-            return criadoEm;
-        }
-
-        public void setCriadoEm(Instant criadoEm) {
-            this.criadoEm = criadoEm;
-        }
-
-        public String getMidiaUrl() {
-            return midiaUrl;
-        }
-
-        public void setMidiaUrl(String midiaUrl) {
-            this.midiaUrl = midiaUrl;
         }
     }
 
