@@ -55,7 +55,7 @@ public class ComentarioController {
     @GetMapping("/download/{filename:.+}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String filename) {
         try {
-            // Caminho onde os arquivos estão armazenados
+
             Path filePath = Paths.get("uploads").resolve(filename).normalize();
 
             Resource resource = new UrlResource(filePath.toUri());
@@ -63,10 +63,8 @@ public class ComentarioController {
                 return ResponseEntity.notFound().build();
             }
 
-            // Define o tipo MIME (opcional, pode usar application/octet-stream para forçar download genérico)
             String contentType = "application/octet-stream";
 
-            // Cabeçalho Content-Disposition para forçar download com nome do arquivo correto
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(contentType))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")

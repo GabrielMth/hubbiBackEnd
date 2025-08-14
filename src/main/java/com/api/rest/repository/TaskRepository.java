@@ -2,6 +2,7 @@ package com.api.rest.repository;
 
 
 import com.api.rest.dto.taskDto.TaskTableResponseDTO;
+import com.api.rest.model.KanbanBoard;
 import com.api.rest.model.Task;
 import com.api.rest.model.TaskPrioridade;
 import com.api.rest.model.TaskStatus;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -52,14 +54,27 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     Page<Task> findByKanbanBoardId(Long kanbanBoardId, Pageable pageable);
 
+
     @Query("SELECT t FROM Task t " +
-            "LEFT JOIN FETCH t.movimentacoes m " +
-            "LEFT JOIN FETCH t.comentarios c " +
-            "LEFT JOIN FETCH c.autor " +
             "LEFT JOIN FETCH t.autor " +
             "LEFT JOIN FETCH t.kanbanBoard " +
             "WHERE t.id = :id")
-    Optional<Task> buscarDetalhada(@Param("id") Long id);
+    Optional<Task> buscarBase(@Param("id") Long id);
 
 
+    @Query("SELECT t FROM Task t " +
+            "LEFT JOIN FETCH t.movimentacoes " +
+            "WHERE t.id = :id")
+    Optional<Task> buscarComMovimentacoes(@Param("id") Long id);
+
+
+    @Query("SELECT t FROM Task t " +
+            "LEFT JOIN FETCH t.comentarios c " +
+            "LEFT JOIN FETCH c.autor " +
+            "WHERE t.id = :id")
+    Optional<Task> buscarComComentarios(@Param("id") Long id);
+
+
+
+    List<Task> findByKanbanBoard(KanbanBoard kanbanBoard);
 }

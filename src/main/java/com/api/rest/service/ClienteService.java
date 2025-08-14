@@ -1,7 +1,7 @@
 package com.api.rest.service;
 
 import com.api.rest.dto.clienteDto.ClienteDTO;
-import com.api.rest.dto.UsuarioDTO;
+import com.api.rest.dto.usuarioDto.UsuarioDTO;
 import com.api.rest.model.Cliente;
 import com.api.rest.model.Endereco;
 import com.api.rest.model.KanbanBoard;
@@ -95,6 +95,12 @@ public class ClienteService {
         Cliente clienteSalva = clienteRepository.findById(id)
                 .orElseThrow(() -> new EmptyResultDataAccessException(1));
         return clienteSalva;
+    }
+
+    public Long buscarClienteIdPorUsername(String username) {
+        return usuarioRepository.findByUsername(username)
+                .map(usuario -> usuario.getCliente().getId())
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado ou sem cliente vinculado"));
     }
 
 }

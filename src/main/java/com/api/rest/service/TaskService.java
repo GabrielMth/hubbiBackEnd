@@ -4,15 +4,23 @@ import com.api.rest.dto.PaginacaoDTO;
 import com.api.rest.dto.taskDto.*;
 import com.api.rest.model.*;
 import com.api.rest.repository.KanbanBoardRepository;
+import com.api.rest.repository.TaskMovementRepository;
 import com.api.rest.repository.TaskRepository;
 import com.api.rest.repository.UserRepository;
 import com.api.rest.service.exceptionDeRegraDeNegocio.TarefaFinalizadaNotDelete;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class TaskService {
@@ -20,11 +28,13 @@ public class TaskService {
     private final UserRepository userRepository;
     private final KanbanBoardRepository kanbanBoardRepository;
     private final TaskRepository taskRepository;
+    private final TaskMovementRepository movementRepository;
 
-    public TaskService(UserRepository userRepository, KanbanBoardRepository kanbanBoardRepository, TaskRepository taskRepository) {
+    public TaskService(UserRepository userRepository, KanbanBoardRepository kanbanBoardRepository, TaskRepository taskRepository, TaskMovementRepository movementRepository) {
         this.userRepository = userRepository;
         this.kanbanBoardRepository = kanbanBoardRepository;
         this.taskRepository = taskRepository;
+        this.movementRepository = movementRepository;
     }
 
     public TaskResponseDTO criarTask(NovaTaskDTO dto) {
@@ -134,10 +144,43 @@ public class TaskService {
 
     @Transactional(readOnly = true)
     public TaskDetalhamentoDTO buscarDetalhadoPorId(Long id) {
-        Task task = taskRepository.buscarDetalhada(id)
+        Task task = taskRepository.buscarBase(id)
                 .orElseThrow(() -> new RuntimeException("Task não encontrada com ID: " + id));
 
+        taskRepository.buscarComMovimentacoes(id);
+        taskRepository.buscarComComentarios(id);
+
         return TaskDetalhamentoDTO.fromEntity(task);
+    }
+
+
+    @Transactional
+    public TaskMoveResponseDTO moverTask(TaskMoveDTO dto, Usuario usuario) {
+        Task task = taskRepository.findById(dto.getTaskId())
+                .orElseThrow(() -> new RuntimeException("Task não encontrada"));
+
+        // Cria a movimentação
+        TaskMovement movement = new TaskMovement();
+        movement.setTask(task);
+        movement.setStatusOrigem(dto.getStatusOrigem());
+        movement.setStatusDestino(dto.getStatusDestino());
+        movement.setMovimentadoPor(usuario);
+        movement.setDataMovimentacao(LocalDateTime.now());
+
+        movementRepository.save(movement);
+
+        // Atualiza o status da task
+        task.setStatus(dto.getStatusDestino());
+        taskRepository.save(task);
+
+
+        return new TaskMoveResponseDTO(
+                task.getId(),
+                movement.getStatusOrigem().name(),
+                movement.getStatusDestino().name(),
+                usuario.getNome(),
+                movement.getDataMovimentacao()
+        );
     }
 
 

@@ -1,9 +1,12 @@
 package com.api.rest.service;
 
-import com.api.rest.dto.LoginRequestDTO;
-import com.api.rest.dto.LoginResponseDTO;
+import com.api.rest.dto.loginDto.LoginRequestDTO;
+import com.api.rest.dto.loginDto.LoginResponseDTO;
 import com.api.rest.model.Role;
+import com.api.rest.model.Usuario;
 import com.api.rest.repository.UserRepository;
+import com.api.rest.service.exceptionDeRegraDeNegocio.ClienteInativoException;
+import com.api.rest.service.exceptionDeRegraDeNegocio.UsuarioInativoException;
 import jakarta.annotation.PostConstruct;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,6 +16,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -45,12 +49,21 @@ public class LoginService {
         }
 
         var user = userOpt.get();
+
+        if (!user.isAtivo()) {
+            throw new UsuarioInativoException("Usuário inativo! Entre em contato com os consultores.");
+        }
+
+        if (user.getCliente() == null || !user.getCliente().isAtivo()) {
+            throw new ClienteInativoException("Sua empresa está inativa! Entre em contato com os consultores.");
+        }
+
         Instant now = Instant.now();
 
         user.atualizarUltimoLogin();
         userRepository.save(user);
 
-        // Criação do access token
+
         JwtClaimsSet accessClaims = JwtClaimsSet.builder()
                 .issuer("mybackend")
                 .subject(user.getUserId().toString())
@@ -62,7 +75,7 @@ public class LoginService {
 
         String accessToken = jwtEncoder.encode(JwtEncoderParameters.from(accessClaims)).getTokenValue();
 
-        // Geração e armazenamento do refresh token
+
         String refreshToken = UUID.randomUUID().toString();
         refreshTokenCache.put(refreshToken, new TokenData(user.getUserId(), System.currentTimeMillis()));
 
@@ -115,6 +128,7 @@ public class LoginService {
                 TimeUnit.SECONDS
         );
     }
+
 
     private record TokenData(Long userId, long timestamp) {}
 }

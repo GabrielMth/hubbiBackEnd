@@ -1,4 +1,4 @@
-package com.api.rest.dto;
+package com.api.rest.dto.usuarioDto;
 
 public record UsuarioResponseDTO (
         Long id,

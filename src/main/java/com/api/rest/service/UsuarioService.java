@@ -1,7 +1,8 @@
 package com.api.rest.service;
 
 import com.api.rest.dto.PaginacaoDTO;
-import com.api.rest.dto.UsuarioDTO;
+import com.api.rest.dto.usuarioDto.UsuarioDTO;
+import com.api.rest.dto.usuarioDto.UsuarioListEquipeDTO;
 import com.api.rest.model.Cliente;
 import com.api.rest.model.Usuario;
 import com.api.rest.repository.ClienteRepository;
@@ -58,7 +59,24 @@ public class UsuarioService {
                 usuario.getEmail(),
                 usuario.getNome(),
                 usuario.getRoles() != null ? usuario.getRoles().toString() : "Sem Perfil",
+                usuario.isAtivo(),
                 formatarUltimoLogin(usuario.getUltimoLogin())
+        ));
+
+        return new PaginacaoDTO<>(dtoPage);
+    }
+
+    public PaginacaoDTO<UsuarioListEquipeDTO> getEquipeByCliente(Long clienteId, Pageable pageable) {
+        Page<Usuario> usuariosPage = userRepository.findByClienteId(clienteId, pageable);
+
+        Page<UsuarioListEquipeDTO> dtoPage = usuariosPage.map(usuario -> new UsuarioListEquipeDTO(
+                usuario.getUserId(),
+                usuario.getUsername(),
+                usuario.getEmail(),
+                usuario.getNome(),
+                usuario.getRoles() != null ? usuario.getRoles().toString() : "Sem Perfil",
+                usuario.isAtivo(),
+                usuario.getUltimoLogin()
         ));
 
         return new PaginacaoDTO<>(dtoPage);
@@ -98,6 +116,7 @@ public class UsuarioService {
         usuario.setPassword(passwordEncoder.encode(senhaGerada));
         usuario.setCliente(cliente);
         usuario.setRoles(Set.of(roleRepository.findByName(dto.role())));
+        usuario.setAtivo(true);
 
         Instant dataAntiga = LocalDate.of(1999, 1, 1)
                 .atStartOfDay(ZoneId.systemDefault())
@@ -110,7 +129,7 @@ public class UsuarioService {
 
 
     private String gerarSenhaAleatoria(int tamanho) {
-        String letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890abcdefghijklmnopqrstuvwxyz";
+        String letras = "@#ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890abcdefghijklmnopqrstuvwxyz";
         Random random = new Random();
         StringBuilder senha = new StringBuilder();
 

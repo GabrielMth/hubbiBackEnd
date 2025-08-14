@@ -1,7 +1,7 @@
 package com.api.rest.model;
 
 
-import com.api.rest.dto.LoginRequestDTO;
+import com.api.rest.dto.loginDto.LoginRequestDTO;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -40,6 +40,9 @@ public class Usuario {
     @ManyToOne
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
+
+    @NotNull
+    private boolean ativo;
 
     @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinTable(
@@ -136,6 +139,14 @@ public class Usuario {
         if (!(o instanceof Usuario)) return false;
         Usuario u = (Usuario) o;
         return userId != null && userId.equals(u.getUserId());
+    }
+
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
     }
 
     @Override

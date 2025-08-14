@@ -1,9 +1,6 @@
 package com.api.rest.exceptionhandler;
 
-import com.api.rest.service.exceptionDeRegraDeNegocio.SenhaAtualIncorretaException;
-import com.api.rest.service.exceptionDeRegraDeNegocio.TarefaFinalizadaNotDelete;
-import com.api.rest.service.exceptionDeRegraDeNegocio.UsuarioTaskMovimentoException;
-import com.api.rest.service.exceptionDeRegraDeNegocio.PessoaInexistenteOuInativaException;
+import com.api.rest.service.exceptionDeRegraDeNegocio.*;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -48,6 +45,18 @@ public class SystemExceptionHandler extends ResponseEntityExceptionHandler {
         String mensagemDesenvolvedor = ex.getCause() != null ? ex.getCause().toString() : ex.toString();
         List<Erro> erros = Arrays.asList(new Erro(mensagemUsuario, mensagemDesenvolvedor));
         return handleExceptionInternal(ex ,erros, headers, HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(UsuarioInativoException.class)
+    public ResponseEntity<Object> handleUsuarioInativo(UsuarioInativoException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(List.of(Map.of("mensagemUsuario", ex.getMessage())));
+    }
+
+    @ExceptionHandler(ClienteInativoException.class)
+    public ResponseEntity<Object> handleClienteInativo(ClienteInativoException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(List.of(Map.of("mensagemUsuario", ex.getMessage())));
     }
 
     @ExceptionHandler({ AccessDeniedException.class})

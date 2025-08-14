@@ -1,14 +1,13 @@
 package com.api.rest.controllers;
 
 import com.api.rest.dto.PaginacaoDTO;
-import com.api.rest.dto.taskDto.NovaTaskDTO;
-import com.api.rest.dto.taskDto.TaskDetalhamentoDTO;
-import com.api.rest.dto.taskDto.TaskResponseDTO;
-import com.api.rest.dto.taskDto.TaskTableResponseDTO;
+import com.api.rest.dto.taskDto.*;
 import com.api.rest.model.Cliente;
 import com.api.rest.model.KanbanBoard;
 import com.api.rest.model.Task;
+import com.api.rest.model.Usuario;
 import com.api.rest.repository.ClienteRepository;
+import com.api.rest.repository.UserRepository;
 import com.api.rest.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +15,10 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -25,15 +28,17 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 
 @RestController
-@RequestMapping("api/tasks")
+@RequestMapping("/api/tasks")
 public class TaskController {
 
     private final TaskService taskService;
     private final ClienteRepository clienteRepository;
+    private final UserRepository userRepository;
 
-    public TaskController(TaskService taskService, ClienteRepository clienteRepository) {
+    public TaskController(TaskService taskService, ClienteRepository clienteRepository, UserRepository userRepository) {
         this.taskService = taskService;
         this.clienteRepository = clienteRepository;
+        this.userRepository = userRepository;
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -107,6 +112,18 @@ public class TaskController {
     public ResponseEntity<TaskDetalhamentoDTO> detalharTask(@PathVariable Long id) {
         TaskDetalhamentoDTO dto = taskService.buscarDetalhadoPorId(id);
         return ResponseEntity.ok(dto);
+    }
+
+    @PatchMapping("/mover")
+    public ResponseEntity<TaskMoveResponseDTO> moverTask(@RequestBody TaskMoveDTO dto, Authentication auth) {
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        Long usuarioId = Long.valueOf(jwt.getClaimAsString("sub"));
+
+        Usuario usuario = userRepository.findById(usuarioId)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+
+        TaskMoveResponseDTO response = taskService.moverTask(dto, usuario);
+        return ResponseEntity.ok(response);
     }
 
 

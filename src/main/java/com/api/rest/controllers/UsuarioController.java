@@ -1,11 +1,10 @@
 package com.api.rest.controllers;
 
-import com.api.rest.dto.AtualizarSenhaDTO;
-import com.api.rest.dto.CreateUserDTO;
-import com.api.rest.model.Role;
+import com.api.rest.dto.loginDto.AtualizarSenhaDTO;
 import com.api.rest.model.Usuario;
 import com.api.rest.repository.RoleRepository;
 import com.api.rest.repository.UserRepository;
+import com.api.rest.service.ClienteService;
 import com.api.rest.service.UsuarioService;
 import com.api.rest.service.exceptionDeRegraDeNegocio.SenhaAtualIncorretaException;
 import jakarta.validation.Valid;
@@ -21,7 +20,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/usuario")
@@ -31,12 +29,14 @@ public class UsuarioController {
     private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final UsuarioService usuarioService;
+    private final ClienteService clienteService;
 
-    public UsuarioController(BCryptPasswordEncoder encoder, UsuarioService usuarioService, RoleRepository roleRepository, UserRepository userRepository) {
+    public UsuarioController(BCryptPasswordEncoder encoder, UsuarioService usuarioService, RoleRepository roleRepository, UserRepository userRepository, ClienteService clienteService) {
         this.passwordEncoder = encoder;
         this.usuarioService = usuarioService;
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
+        this.clienteService = clienteService;
     }
 
     @PatchMapping("/senha")
@@ -65,10 +65,29 @@ public class UsuarioController {
     }
 
     @GetMapping("/list")
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Usuario>> listarUsuarios () {
         var listUsuarios = userRepository.findAll();
 
         return ResponseEntity.ok(listUsuarios);
     }
+
+    @PatchMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    public ResponseEntity<Object> atualizarStatusUsuario(
+            @PathVariable Long id,
+            @RequestParam boolean ativo) {
+
+        var usuario = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
+
+        usuario.setAtivo(ativo);
+        userRepository.save(usuario);
+
+        String mensagem = ativo ? "Usuário ativado com sucesso." : "Usuário inativado com sucesso.";
+
+        return ResponseEntity.ok(Map.of("mensagem", mensagem));
+    }
+
 }

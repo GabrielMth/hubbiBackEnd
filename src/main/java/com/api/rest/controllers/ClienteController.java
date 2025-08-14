@@ -4,10 +4,15 @@ package com.api.rest.controllers;
 import com.api.rest.dto.*;
 import com.api.rest.dto.clienteDto.ClienteDTO;
 import com.api.rest.dto.clienteDto.ClienteDropdownDTO;
+import com.api.rest.dto.clienteDto.ClienteResumoDTO;
+import com.api.rest.dto.usuarioDto.UsuarioDTO;
+import com.api.rest.dto.usuarioDto.UsuarioListEquipeDTO;
+import com.api.rest.dto.usuarioDto.UsuarioResponseDTO;
 import com.api.rest.event.RecursoCriadoEvent;
 import com.api.rest.model.Cliente;
 import com.api.rest.model.Usuario;
 import com.api.rest.repository.ClienteRepository;
+import com.api.rest.repository.UserRepository;
 import com.api.rest.service.ClienteService;
 import com.api.rest.service.UsuarioService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,6 +25,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +39,9 @@ public class ClienteController {
 
     @Autowired
     private ClienteRepository clienteRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private ApplicationEventPublisher publisher;
@@ -152,6 +162,16 @@ public class ClienteController {
         return ResponseEntity.ok(usuarios);
     }
 
+    @PreAuthorize("hasAnyRole('GERENTE','COLABORADOR','ADMIN')")
+    @GetMapping("/{clienteId}/equipe")
+    public ResponseEntity<PaginacaoDTO<UsuarioListEquipeDTO>> listarEquipedoCliente(
+            @PathVariable Long clienteId,
+            Pageable pageable) {
+
+        PaginacaoDTO<UsuarioListEquipeDTO> usuarios = userService.getEquipeByCliente(clienteId, pageable);
+        return ResponseEntity.ok(usuarios);
+    }
+
     @PostMapping("/{clienteId}/usuarios")
     public ResponseEntity<UsuarioResponseDTO> criarUsuarioParaCliente(
             @PathVariable Long clienteId,
@@ -171,11 +191,41 @@ public class ClienteController {
         ));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/usuarios/{id}")
     public ResponseEntity<Void> excluirUsuario(@PathVariable Long id) {
         userService.excluirUsuarioPorId(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PreAuthorize("hasAnyRole('GERENTE','COLABORADOR','ADMIN')")
+    @GetMapping("/identificarmeucliente")
+    public ResponseEntity<ClienteResumoDTO> getClienteDoUsuarioLogado(
+            @AuthenticationPrincipal Jwt principal) {
+
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Long userId = Long.valueOf(principal.getClaim("sub"));
+
+        Usuario usuarioLogado = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        Cliente cliente = usuarioLogado.getCliente();
+        if (cliente == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        ClienteResumoDTO clienteResumo = new ClienteResumoDTO(
+                cliente.getId(),
+                cliente.getNome(),
+                cliente.getDocumento()
+        );
+
+        return ResponseEntity.ok(clienteResumo);
+    }
+
 
 
 

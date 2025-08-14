@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
@@ -22,5 +23,7 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
 
     @Query("SELECT new com.api.rest.dto.clienteDto.ClienteDropdownDTO(c.id, c.nome, c.documento, c.kanbanBoard.id) FROM Cliente c")
     List<ClienteDropdownDTO> buscarParaDropDown();
+
+    Optional<Cliente> findByUsuariosUserId(Long userId);
 
 }
